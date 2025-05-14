@@ -1,28 +1,34 @@
-name: AOK_Daily_Image
+name: Daily Image Generation
+
 on:
-  schedule: [{ cron: "0 13 * * *" }]
-  workflow_dispatch:
+  schedule:
+    - cron: "0 1 * * *" # Every day at 01:00 UTC
+    - cron: "0 13 * * *" # Every day at 13:00 UTC
+  workflow_dispatch: # Allow manual trigger from GitHub UI
 
 jobs:
-  run:
+  generate-image:
     runs-on: ubuntu-latest
-    permissions: { contents: write }
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: "20" }
-      - run: npm ci
-      - run: npx ts-node src/index.ts
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          SHOPIFY_DOMAIN: ${{ secrets.SHOPIFY_DOMAIN }}
-          SHOPIFY_STOREFRONT_TOKEN: ${{ secrets.SHOPIFY_STOREFRONT_TOKEN }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          S3_BUCKET: ${{ secrets.S3_BUCKET }}
-          VERCEL_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
-          GITHUB_ACTIONS: true
-          SHOPIFY_DOMAIN: a-ok.myshopify.com
-      - uses: stefanzweifel/git-auto-commit-action@v5
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          commit_message: "chore(auto-art): add $(date -I)"
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run image generation script
+        run: npm start
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/daily manifest.json
+          git commit -m "chore: add new daily image [skip ci]" || echo "No changes to commit"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
