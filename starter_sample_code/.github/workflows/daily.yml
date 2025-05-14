@@ -1,0 +1,23 @@
+name: A‑OK_Daily_Image
+on:
+  schedule: [{ cron: "0 13 * * *" }] # 06:00 PST
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    permissions: { contents: write }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm ci
+      - run: node dist/index.js
+        env:
+          SHOPIFY_STOREFRONT_TOKEN: ${{ secrets.SHOPIFY_STOREFRONT_TOKEN }}
+          SHOPIFY_DOMAIN: a-ok.myshopify.com
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          S3_BUCKET: aok-artifacts
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with: { commit_message: "chore(auto-art): $(date -Iseconds)" }

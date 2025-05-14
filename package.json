@@ -1,0 +1,25 @@
+{
+  "name": "self-replicating-art",
+  "version": "1.0.0",
+  "description": "Automated service that **pulls every product & grid image from Apes On Keys (Shopify + S3)**, distills them with GPT‑4o Vision, generates a fresh on‑brand graphic via OpenAI's Image Generation API, stores the file in S3, updates a JSON manifest, and pings a Vercel Deploy Hook so the storefront grid self‑replicates daily.",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.0.0",
+    "dotenv": "^16.0.0",
+    "graphql-request": "^6.0.0",
+    "openai": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  }
+}
