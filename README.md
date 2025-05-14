@@ -52,10 +52,9 @@ Generated images are stored in the repo under `public/daily/` with filenames in 
 GitHub Actions (cron)
    └─▶ Node script (src/index.ts)
          ├─ fetchShopifyMedia.ts  ← Storefront GraphQL API
-         ├─ listS3GridImages.ts  ← a-ok.shop gallery API
+         ├─ listGridImages.ts  ← a-ok.shop gallery API
          ├─ craftPrompt.ts       ← brand rules + descriptors
          ├─ generateImage.ts     ← OpenAI imagegen 1×1024 PNG
-         ├─ uploadToS3.ts        ← local file write (daily/YYYY-MM-DD.png)
          └─ manifest.json update + Vercel Deploy Hook
 ```
 
