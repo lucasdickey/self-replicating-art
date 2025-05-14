@@ -1,9 +1,8 @@
 import "dotenv/config";
 import { getProductMedia } from "./fetchShopifyMedia";
-import { listGridImages } from "./listS3GridImages";
+import { listGridImages } from "./listGridImages";
 import { makePrompt } from "./craftPrompt";
 import { generateImage } from "./generateImage";
-import { uploadToS3 } from "./uploadToS3";
 import fs from "fs/promises";
 
 async function main() {
@@ -12,34 +11,33 @@ async function main() {
     if (!process.env.SHOPIFY_DOMAIN || !process.env.SHOPIFY_STOREFRONT_TOKEN) {
       throw new Error("Missing Shopify credentials");
     }
-    if (!process.env.S3_BUCKET) {
-      throw new Error("Missing S3 bucket name");
-    }
     if (!process.env.OPENAI_API_KEY) {
       throw new Error("Missing OpenAI API key");
     }
 
-    // 2. Aggregate descriptors from Shopify + S3
-    const [shopifyMedia, s3Media] = await Promise.all([
+    // 2. Aggregate descriptors from Shopify + grid images
+    const [shopifyMedia, gridMedia] = await Promise.all([
       getProductMedia(),
       listGridImages(),
     ]);
 
-    const allDescriptors = [...shopifyMedia, ...s3Media].map((m) => m.alt);
+    const allDescriptors = [...shopifyMedia, ...gridMedia].map((m) => m.alt);
 
     // 3. Build prompt
     const prompt = makePrompt(allDescriptors);
     console.log("Generated prompt:", prompt);
 
-    // 4. Generate and upload image
+    // 4. Generate and save image
     const imageBuffer = await generateImage(prompt);
-    const url = await uploadToS3(imageBuffer);
-    console.log("✅ Image uploaded:", url);
+    const dateStr = new Date().toISOString().split("T")[0];
+    const filePath = `public/daily/${dateStr}.png`;
+    await fs.writeFile(filePath, imageBuffer);
+    console.log("✅ Image saved:", filePath);
 
     // 5. Update manifest
     const manifestPath = "manifest.json";
     const manifest = JSON.parse(await fs.readFile(manifestPath, "utf8"));
-    manifest.unshift({ date: Date.now(), prompt, url });
+    manifest.unshift({ date: Date.now(), prompt, url: filePath });
     await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2));
     console.log("✅ Manifest updated");
 
