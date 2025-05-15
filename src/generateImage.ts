@@ -10,6 +10,7 @@ export async function generateImage(prompt: string): Promise<Buffer> {
     prompt,
     n: 1,
     size: "1024x1024",
+    style: "vivid",
     response_format: "b64_json",
     user: "aok-image-agents",
   });

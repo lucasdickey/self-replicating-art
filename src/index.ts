@@ -38,8 +38,10 @@ async function main() {
 
     // 4. Generate and save image
     const imageBuffer = await generateImage(prompt);
-    const dateStr = new Date().toISOString().split("T")[0];
-    const filePath = `public/daily/${dateStr}.png`;
+    const now = new Date();
+    const dateStr = now.toISOString().split("T")[0];
+    const hourStr = now.getUTCHours().toString().padStart(2, "0");
+    const filePath = `public/daily/${dateStr}-${hourStr}.png`;
     await fs.writeFile(filePath, imageBuffer);
     console.log("✅ Image saved:", filePath);
 
