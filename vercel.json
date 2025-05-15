@@ -1,0 +1,8 @@
+{
+  "headers": [
+    {
+      "source": "/daily/(.*)",
+      "headers": [{ "key": "Access-Control-Allow-Origin", "value": "*" }]
+    }
+  ]
+}

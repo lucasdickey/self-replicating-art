@@ -3,6 +3,7 @@ import path from "path";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
   try {
     const dailyDir = path.join(process.cwd(), "public/daily");
     const files = await fs.readdir(dailyDir);
