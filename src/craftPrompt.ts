@@ -10,5 +10,5 @@ export function makePrompt(descriptors: string[]) {
 
   return `${BRAND_RULES}
 Inspiration snippets: ${validDescriptors.join("; ")}
-Generate 1 graphic intended for t-shirt or poster printing. Focus on powerful iconography and 1–2 bold text phrases. Use large, centered, stencil-style lettering only. Avoid text clutter.`;
+Generate 1 graphic intended for t-shirt or poster printing. Focus on powerful iconography and 1–2 bold text phrases. Use large, centered, stencil-style lettering only. Only include A-OK or APES ON KEYS as text. No other text.`;
 }
