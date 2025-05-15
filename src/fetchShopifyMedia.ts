@@ -25,13 +25,18 @@ const query = /* GraphQL */ `
   }
 `;
 
-type ProductMedia = { url: string; alt: string };
+type ProductMedia = {
+  url: string;
+  alt: string;
+  description: string;
+};
 
 type ShopifyResponse = {
   products: {
     edges: Array<{
       node: {
         title: string;
+        description: string;
         media: {
           edges: Array<{
             node: {
@@ -58,6 +63,7 @@ export async function getProductMedia(): Promise<ProductMedia[]> {
     e.node.media.edges.map((m) => ({
       url: m.node.image.url,
       alt: m.node.image.altText || e.node.title,
+      description: e.node.description,
     }))
   );
 }

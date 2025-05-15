@@ -5,6 +5,11 @@ import { makePrompt } from "./craftPrompt";
 import { generateImage } from "./generateImage";
 import fs from "fs/promises";
 
+type GridImage = {
+  url: string;
+  alt: string;
+};
+
 async function main() {
   try {
     // 1. Load environment variables
@@ -21,7 +26,11 @@ async function main() {
       listGridImages(),
     ]);
 
-    const allDescriptors = [...shopifyMedia, ...gridMedia].map((m) => m.alt);
+    const allDescriptors = [
+      ...shopifyMedia.map((m) => m.alt),
+      ...shopifyMedia.map((m) => m.description),
+      ...gridMedia.map((m: GridImage) => m.alt),
+    ];
 
     // 3. Build prompt
     const prompt = makePrompt(allDescriptors);
