@@ -5,6 +5,15 @@ import { makePrompt } from "./craftPrompt";
 import { generateImage } from "./generateImage";
 import fs from "fs/promises";
 
+function generateRandomHash(length: number = 4): string {
+  const chars = "0123456789abcdefghijklmnopqrstuvwxyz";
+  let hash = "";
+  for (let i = 0; i < length; i++) {
+    hash += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return hash;
+}
+
 type GridImage = {
   url: string;
   alt: string;
@@ -41,7 +50,8 @@ async function main() {
     const now = new Date();
     const dateStr = now.toISOString().split("T")[0];
     const hourStr = now.getUTCHours().toString().padStart(2, "0");
-    const filePath = `public/daily/${dateStr}-${hourStr}.png`;
+    const randomHash = generateRandomHash();
+    const filePath = `public/daily/${dateStr}-${hourStr}-${randomHash}.png`;
     await fs.writeFile(filePath, imageBuffer);
     console.log("✅ Image saved:", filePath);
 
