@@ -15,10 +15,19 @@ function generateRandomHash(length: number = 4): string {
   return hash;
 }
 
-type GridImage = {
+// Define interfaces for our media types
+interface MediaWithUrl {
   url: string;
   alt: string;
-};
+}
+
+interface ShopifyMedia extends MediaWithUrl {
+  description: string;
+}
+
+interface GridImage extends MediaWithUrl {
+  // Any additional fields specific to grid images can be added here
+}
 
 async function main() {
   try {
@@ -32,8 +41,8 @@ async function main() {
 
     // 2. Aggregate descriptors from Shopify + grid images
     const [shopifyMedia, gridMedia] = await Promise.all([
-      getProductMedia(),
-      listGridImages(),
+      getProductMedia() as Promise<ShopifyMedia[]>,
+      listGridImages() as Promise<GridImage[]>,
     ]);
 
     function sample<T>(arr: T[], count: number): T[] {
@@ -49,13 +58,19 @@ async function main() {
     const sampledShopify = sample(shopifyMedia, 3);
     const sampledGrid = sample(gridMedia, 3);
 
+    // Combine the arrays with proper typing
+    const combinedMedia: MediaWithUrl[] = [
+      ...sampledShopify as ShopifyMedia[], 
+      ...sampledGrid as GridImage[]
+    ];
+    
     const imageDescriptions = await Promise.all(
-      [...sampledShopify, ...sampledGrid].map((img) => describeImage(img.url))
+      combinedMedia.map((img) => describeImage(img.url))
     );
 
     const allDescriptors = [
-      ...shopifyMedia.map((m) => m.alt),
-      ...shopifyMedia.map((m) => m.description),
+      ...shopifyMedia.map((m: ShopifyMedia) => m.alt),
+      ...shopifyMedia.map((m: ShopifyMedia) => m.description),
       ...gridMedia.map((m: GridImage) => m.alt),
       ...imageDescriptions,
     ];
