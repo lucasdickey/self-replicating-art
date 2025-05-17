@@ -2,7 +2,7 @@
 
 An automated service that generates daily on-brand graphics for Apes On Keys by:
 
-1. Pulling product & grid images from Shopify and the a-ok.shop gallery API
+1. Pulling product & grid images from Shopify and the a-ok.shop gallery API and summarising them with GPT-4o Vision
 2. Generating fresh graphics using OpenAI's DALL-E 3
 3. Storing the results in the local repo under `public/daily/`
 4. Updating a manifest of generated images
@@ -53,6 +53,7 @@ GitHub Actions (cron)
    └─▶ Node script (src/index.ts)
          ├─ fetchShopifyMedia.ts  ← Storefront GraphQL API
          ├─ listGridImages.ts  ← a-ok.shop gallery API
+         ├─ describeImage.ts    ← GPT-4o Vision summaries
          ├─ craftPrompt.ts       ← brand rules + descriptors
          ├─ generateImage.ts     ← OpenAI imagegen 1×1024 PNG
          └─ manifest.json update + Vercel Deploy Hook
