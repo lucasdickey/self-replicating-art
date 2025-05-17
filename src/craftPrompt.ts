@@ -1,7 +1,8 @@
 const BRAND_RULES = `
 Apes On Keys street-art; bold red/black/white; mid-century Hitchcock poster vibe; stencil feel; print-ready;
 large letters only; max 4 words; no paragraphs; no fake UI; high-contrast; AGI themes;
-no lorem ipsum; no techno babble; no multiple text boxes; avoid filler text;`;
+no lorem ipsum; no techno babble; no multiple text boxes; avoid filler text;
+inspired by product copy, catalog imagery and a-ok-shop project photos;`;
 
 export function makePrompt(descriptors: string[]) {
   const validDescriptors = descriptors
