@@ -1,8 +1,9 @@
 import "dotenv/config";
 import { getProductMedia } from "./fetchShopifyMedia";
-import { listGridImages } from "./listGridImages";
+import { listGridImages, GridImage } from "./listGridImages";
 import { makePrompt } from "./craftPrompt";
 import { generateImage } from "./generateImage";
+import { describeImage } from "./describeImage";
 import fs from "fs/promises";
 
 function generateRandomHash(length: number = 4): string {
@@ -14,10 +15,6 @@ function generateRandomHash(length: number = 4): string {
   return hash;
 }
 
-type GridImage = {
-  url: string;
-  alt: string;
-};
 
 async function main() {
   try {
@@ -35,10 +32,30 @@ async function main() {
       listGridImages(),
     ]);
 
+    function sample<T>(arr: T[], count: number): T[] {
+      const copy = [...arr];
+      const out: T[] = [];
+      for (let i = 0; i < count && copy.length; i++) {
+        const idx = Math.floor(Math.random() * copy.length);
+        out.push(copy.splice(idx, 1)[0]);
+      }
+      return out;
+    }
+
+    const sampledShopify = sample(shopifyMedia, 3);
+    const sampledGrid = sample(gridMedia, 3);
+
+    const imageDescriptions = await Promise.all(
+      [...sampledShopify, ...sampledGrid].map((img: { url: string }) =>
+        describeImage(img.url)
+      )
+    );
+
     const allDescriptors = [
       ...shopifyMedia.map((m) => m.alt),
       ...shopifyMedia.map((m) => m.description),
       ...gridMedia.map((m: GridImage) => m.alt),
+      ...imageDescriptions,
     ];
 
     // 3. Build prompt
