@@ -5,6 +5,7 @@ import { makePrompt } from "./craftPrompt";
 import { generateImage } from "./generateImage";
 import { describeImage } from "./describeImage";
 import fs from "fs/promises";
+import path from "path";
 
 function generateRandomHash(length: number = 4): string {
   const chars = "0123456789abcdefghijklmnopqrstuvwxyz";
@@ -38,6 +39,18 @@ async function main() {
     if (!process.env.OPENAI_API_KEY) {
       throw new Error("Missing OpenAI API key");
     }
+    
+    // Define priority images to use as primary inputs
+    const priorityImages = [
+      {
+        url: path.join(process.cwd(), "public/inspo/a-ok-hat-expressive-face-circle.png"),
+        alt: "A-OK expressive face with hat in circle"
+      },
+      {
+        url: path.join(process.cwd(), "public/inspo/a-ok-face.jpg"),
+        alt: "A-OK face illustration"
+      }
+    ];
 
     // 2. Aggregate descriptors from Shopify + grid images
     const [shopifyMedia, gridMedia] = await Promise.all([
@@ -58,24 +71,36 @@ async function main() {
     const sampledShopify = sample(shopifyMedia, 3);
     const sampledGrid = sample(gridMedia, 3);
 
+    // First, get descriptions for priority images
+    console.log("Getting descriptions for priority images...");
+    const priorityImageDescriptions = await Promise.all(
+      priorityImages.map((img) => describeImage(img.url))
+    );
+    
+    // Then process the other images
     // Combine the arrays with proper typing
     const combinedMedia: MediaWithUrl[] = [
       ...sampledShopify as ShopifyMedia[], 
       ...sampledGrid as GridImage[]
     ];
     
-    const imageDescriptions = await Promise.all(
+    const otherImageDescriptions = await Promise.all(
       combinedMedia.map((img) => describeImage(img.url))
     );
 
+    // Prioritize the specific images by putting their descriptions first
     const allDescriptors = [
+      // Priority image descriptions come first
+      ...priorityImages.map(img => img.alt),
+      ...priorityImageDescriptions,
+      // Then the rest of the descriptors
       ...shopifyMedia.map((m: ShopifyMedia) => m.alt),
       ...shopifyMedia.map((m: ShopifyMedia) => m.description),
       ...gridMedia.map((m: GridImage) => m.alt),
-      ...imageDescriptions,
+      ...otherImageDescriptions,
     ];
 
-    // 3. Build prompt
+    // 3. Build prompt with priority given to the specific images
     const prompt = makePrompt(allDescriptors);
     console.log("Generated prompt:", prompt);
 
