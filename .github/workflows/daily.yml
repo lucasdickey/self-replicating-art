@@ -36,6 +36,11 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add public/daily manifest.json
           git commit -m "chore: add new daily image [skip ci]" || echo "No changes to commit"
+          
+          # Pull with rebase to handle conflicts
+          git pull --rebase origin master
+          
+          # Push with force if needed (use with caution)
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
