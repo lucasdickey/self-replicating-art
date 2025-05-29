@@ -1,11 +1,6 @@
 const BRAND_RULES = `
-<<<<<<< HEAD
-Apes On Keys street-art; bold red/black/white; mid-century horror film poster vibe; stencil feel; print-ready;
-high-contrast; AGI themes; inspired by A-OK product descriptions and catalog imagery plus a-ok-shop project photos; streetwear and street art inspired`;
-=======
 Apes On Keys street-art; bold red/black/white/#903018/#F5EAD2/#A03518/#F5EAD2/#903018; mid-century horror & thriller movie poster vibe; satirical; stencil feel; print-ready;
 high-contrast; AGI themes; inspired by product copy and a-ok-shop project photos; streetwear and street art inspired`;
->>>>>>> 6a13bcc (update craftPrompt to mix up color style a bit)
 
 export function makePrompt(descriptors: string[]) {
   // Filter out empty descriptors
