@@ -29,6 +29,10 @@ export async function describeImage(url: string): Promise<string> {
     const isLocalFile = !url.startsWith('http') && !url.startsWith('data:');
     
     let imageUrl = url;
+    // Encode only remote URLs (not data: or base64)
+    if (!isLocalFile && (url.startsWith('http://') || url.startsWith('https://'))) {
+      imageUrl = encodeURI(url);
+    }
     
     if (isLocalFile) {
       try {
